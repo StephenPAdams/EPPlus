@@ -1944,8 +1944,9 @@ namespace OfficeOpenXml
 		/// <param name="TableStyle">Will create a table with this style. If set to TableStyles.None no table will be created</param>
 		/// <param name="memberFlags">Property flags to use</param>
 		/// <param name="Members">The properties to output. Must be of type T</param>
+		/// <param name="ignoreMemberCheck"></param>
 		/// <returns>The filled range</returns>
-		public ExcelRangeBase LoadFromCollection<T>(IEnumerable<T> Collection, bool PrintHeaders, TableStyles TableStyle, BindingFlags memberFlags, MemberInfo[] Members)
+		public ExcelRangeBase LoadFromCollection<T>(IEnumerable<T> Collection, bool PrintHeaders, TableStyles TableStyle, BindingFlags memberFlags, MemberInfo[] Members, Boolean ignoreMemberCheck = false)
 		{
 			var type = typeof(T);
 			if (Members == null)
@@ -1954,13 +1955,17 @@ namespace OfficeOpenXml
 			}
 			else
 			{
-				foreach (var t in Members)
-				{
-                    if (t.DeclaringType!=null && t.DeclaringType != type && !t.DeclaringType.IsSubclassOf(type))
-					{
-						throw new InvalidCastException("Supplied properties in parameter Properties must be of the same type as T (or an assignable type from T");
-					}
-				}
+			    if (!ignoreMemberCheck)
+			    {
+			        foreach (var t in Members)
+			        {
+			            if (t.DeclaringType != null && t.DeclaringType != type && !t.DeclaringType.IsSubclassOf(type))
+			            {
+			                throw new InvalidCastException(
+			                    "Supplied properties in parameter Properties must be of the same type as T (or an assignable type from T");
+			            }
+			        }
+			    }
 			}
 
             // create buffer
